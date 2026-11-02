@@ -26,7 +26,7 @@ No CLI? Copy a folder from [`skills/`](skills) into `~/.claude/skills/` (Claude 
 
 > Your UI works. Now find the three moments worth animating, not the thirty.
 
-Scans a built React / Next.js frontend for the moments that *mean* something: a first success, an empty list getting its first item, results arriving, a theme switch. It ranks them, caps them per screen, and hands you a menu. You pick; it builds only those, with reduced-motion, no-JS and accessibility guardrails, then verifies the result.
+Scans a built React / Next.js or Vue / Nuxt frontend for the moments that *mean* something: a first success, an empty list getting its first item, results arriving, a theme switch. It ranks them, caps them per screen, and hands you a menu. You pick; it builds only those, with reduced-motion, no-JS and accessibility guardrails, then verifies the result.
 
 ```text
 You:    The page is done. Find wow moments in it.
@@ -43,13 +43,15 @@ Agent:  implements both, then typechecks, builds and checks the reduced-motion p
 
 Abridged from a real run on the [`landing-page`](examples/wow-moments/landing-page) fixture; the GIF above shows the result.
 
-10 worked patterns · 11 moment types · a scoring rubric · an anti-slop list · motion-free test fixtures
+12 worked patterns · React and Vue · remembers your motion language between runs · a guardrail checker · evaluated end to end with a real agent
 
 ## Repository layout
 
 ```
 skills/<name>/      the skill itself: SKILL.md, references/, README.md
 examples/<name>/    test fixtures (not installed with the skill)
+evals/<name>/       end-to-end agent evals (run by hand, cost tokens)
+tools/              CI checks: skill format, links, typechecked code blocks
 assets/             images for these READMEs
 ```
 

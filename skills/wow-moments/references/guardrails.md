@@ -18,6 +18,8 @@ Every implemented moment must pass all of these. They are what separates a craft
 
 ## Verify
 
+[`scripts/verify.mjs`](../scripts/verify.mjs) automates checks 1, 2, 5 and 9 on a running app (`node scripts/verify.mjs <url> --click "<selector>"`). Do the rest by hand:
+
 - Run the project's typecheck and build.
 - Emulate reduced motion (DevTools rendering panel, or `page.emulateMedia({ reducedMotion: "reduce" })` in Playwright) and trigger the moment.
 - Disable JavaScript and load the page: everything is visible.

@@ -1,0 +1,52 @@
+name: check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  # Free, deterministic checks on every push. The agent eval
+  # (evals/wow-moments/run.mjs) costs tokens and is run by hand before a release.
+  skills:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: tools/package-lock.json
+      - run: npm ci
+        working-directory: tools
+      - name: Validate skills (frontmatter, links)
+        run: node tools/check-skills.mjs
+      - name: Typecheck code blocks in skills
+        run: node tools/check-snippets.mjs
+      # Test fixtures are only useful while they have nothing to find already.
+      - name: Fixtures stay motion-free
+        run: |
+          if grep -rnE '@keyframes|\b(animation|transition)\b' \
+              examples/wow-moments/landing-page/{app,components} \
+              examples/wow-moments/sample-next-app/{app,components}; then
+            echo "::error::a motion-free fixture contains motion"; exit 1
+          fi
+
+  fixtures:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        fixture:
+          - examples/wow-moments/sample-next-app
+          - examples/wow-moments/landing-page
+          - examples/wow-moments/landing-page-after
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: ${{ matrix.fixture }}/package-lock.json
+      - run: npm ci && npm run build
+        working-directory: ${{ matrix.fixture }}

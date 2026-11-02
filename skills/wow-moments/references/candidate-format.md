@@ -26,6 +26,7 @@ Tone assumed: <calm | playful | premium | technical>
 - Risk: `layout` inside a CSS grid with `gap` needs `layout="position"` to avoid stretched text
 
 ### Considered, not recommended
+- Skipped, declined before (`.wow-moments.md`): price roll on billing toggle
 - Hover lift on project cards: plays dozens of times a session and carries no information (score 4)
 - Parallax on dashboard header: decoration, fails the remove test
 
@@ -36,7 +37,7 @@ Reply with IDs (`A1, A2`), `recommended`, or ask to tweak one.
 ## Rules
 
 - ★ marks recommended picks only (score ≥ 9 and within budget).
-- `file:line` must point to code that exists. Verify it, don't guess.
+- `file:line` must point to code that exists, written as the full path from the project root (`app/projects/page.tsx:42`), everywhere in the menu, including the not-recommended list and side notes. A bare `page.tsx` is ambiguous in any real app. Verify it, don't guess.
 - Effort: **S** = CSS or one file, **M** = a client component or library use, **L** = cross-route, new dependency, or fragile measurement.
 - Name the technique *and* whether the library it needs is already installed.
 - Always include the reduced-motion behaviour. It's part of the design, not an afterthought.

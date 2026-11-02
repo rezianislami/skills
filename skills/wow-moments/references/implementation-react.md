@@ -84,7 +84,7 @@ const nextConfig = { experimental: { viewTransition: true } };
 export default nextConfig;
 ```
 
-```tsx
+```tsx nocheck
 import { ViewTransition } from "react";
 import Link from "next/link";
 
@@ -97,7 +97,7 @@ import Link from "next/link";
 </ViewTransition>
 ```
 
-Default to `"none"` so only tagged navigations animate.
+Default to `"none"` so only tagged navigations animate. The full list → detail recipe, with the shared element, both directions and the reduced-motion CSS, is in [pattern-route-transition.md](pattern-route-transition.md).
 
 ## rAF-driven values
 

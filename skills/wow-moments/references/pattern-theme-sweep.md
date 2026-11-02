@@ -56,7 +56,7 @@ export function sweepTheme(next: Theme, setTheme: (t: Theme) => void, origin: { 
 
 Call it from the toggle's click handler, with the toggle's centre as the origin:
 
-```tsx
+```tsx nocheck
 onClick={(e) => {
   const r = e.currentTarget.getBoundingClientRect();
   sweepTheme(next, setTheme, { x: r.left + r.width / 2, y: r.top + r.height / 2 });

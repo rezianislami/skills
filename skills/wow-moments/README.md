@@ -15,14 +15,16 @@ npx skills add rezianislami/skills --skill wow-moments
 ## How it works
 
 ```
- 1. Intake    reads package.json and the motion you already have; asks at most two questions
+ 1. Intake    reads .wow-moments.md, package.json and the motion you already have;
+      │       asks at most two questions
       │
  2. Scan      every screen → its state changes → 11 moment types → scored and budgeted
       │
  3. Menu ⛔   ranked candidates with file:line, trigger, technique and reduced-motion behaviour
       │       … then it stops. Nothing changes until you pick.
       │
- 4. Build     only your picks, lightest technique first; then typecheck, build and verify
+ 4. Build     only your picks, lightest technique first; then typecheck, build,
+              run scripts/verify.mjs, and update .wow-moments.md
 ```
 
 ## What makes it different
@@ -33,6 +35,8 @@ npx skills add rezianislami/skills --skill wow-moments
 | **A budget, not a buffet** | At most one hero and three smaller moments per screen. "Nothing here" is a valid answer, and it tells you what it rejected and why. |
 | **You choose** | The scan ends with a menu. Nothing is implemented until you reply with IDs. |
 | **Built properly** | Reduced-motion path, correct first paint without JavaScript, no layout shift, screen-reader-safe, touch-aware, and comments that explain *why*. |
+| **Remembers** | A small `.wow-moments.md` in your repo records the motion language, what was built and what you declined. The next run matches the signature and doesn't pitch rejected ideas again. |
+| **React and Vue** | React / Next.js and Vue / Nuxt, with the Vue versions of the patterns checked in a real browser. |
 | **Uses what you have** | Plain CSS, Tailwind, Motion (`motion` / `framer-motion`) or View Transitions, whichever your project already uses. No surprise dependencies. |
 
 ## A real menu
@@ -61,8 +65,10 @@ Picking `A1, A2` produced [`landing-page-after`](../../examples/wow-moments/land
 | Error feedback | Field shakes once, error grows in place |
 | List enter | New item arrives, the rows below glide down |
 | Skeleton reveal | Results replace a skeleton in the same box |
+| Streaming answer | AI answer streams: real step status, stick-to-bottom, quiet finish |
+| Route transition | List → detail: the clicked item travels, the page slides by direction |
 
-Every pattern explains *why* it's built that way, and its code is typechecked.
+Every pattern explains *why* it's built that way, and its code is typechecked in CI.
 
 ## Install
 
@@ -77,9 +83,32 @@ Or copy this folder into your agent's skills folder:
 | Claude Code | `.claude/skills/wow-moments/` | `~/.claude/skills/wow-moments/` |
 | Codex | `.agents/skills/wow-moments/` | `~/.agents/skills/wow-moments/` |
 
-Built for **React and Next.js** (App Router and Pages Router). Then, once your UI is built, ask:
+Works with **React / Next.js** (App Router and Pages Router) and **Vue / Nuxt**. Then, once your UI is built, ask:
 
 > The UI is done. Find wow moments in it.
+
+## Verify a moment
+
+The skill runs this itself in Phase 4, but you can run it too, against any running page:
+
+```bash
+node skills/wow-moments/scripts/verify.mjs http://localhost:3000/ \
+  --fill "input[type=email]=me@example.com" --click "form button"
+```
+
+```
+✓ first paint without JS shows content
+✓ reduced motion stops movement
+✓ layout shift (CLS) under 0.1  (CLS 0.000)
+✓ no transform/filter traps fixed elements
+```
+
+It needs Playwright in your project (or globally), and falls back to an installed Chrome if Playwright's browser isn't downloaded.
+
+## How it's tested
+
+- **Every push (CI):** frontmatter and links validated, every code block in the skill typechecked (React with `tsc`, Vue with `vue-tsc`), every fixture built, and the motion-free fixtures checked to still be motion-free.
+- **Before a release:** [`evals/wow-moments/run.mjs`](../../evals/wow-moments/run.mjs) runs a real headless Claude Code session on a fixture and checks that the skill triggers on its own, stops at the menu, changes nothing before you pick, keeps to the budget, cites real `file:line`s, and that the picked moments build with reduced motion handled and no new dependencies.
 
 ## Try it on a fixture
 

@@ -40,7 +40,7 @@ Work takes more than a second: AI generating, a scan running, an upload processi
 
 - **Signals:** streaming responses, `status: "running"`, polling, progress events, job IDs.
 - **Tier:** micro, or transition when the wait is long and central.
-- **Technique:** a status line whose label rolls to the next real step ([pattern-rolling-text.md](pattern-rolling-text.md)), a subtle shimmer on the label, streaming text that appends without re-flowing what's above.
+- **Technique:** a status line whose label rolls to the next real step ([pattern-rolling-text.md](pattern-rolling-text.md)), a subtle shimmer on the label, streaming text that appends without re-flowing what's above ([pattern-streaming-text.md](pattern-streaming-text.md)).
 - **Trap:** fake progress bars, or delaying content to show off a loader.
 
 ## 5. Numbers that matter
@@ -67,7 +67,7 @@ Moving between related places: list → detail, wizard step 1 → 2, gallery →
 
 - **Signals:** dynamic routes (`[id]`), step state, `router.push` after a selection.
 - **Tier:** transition.
-- **Technique:** View Transitions, with a shared element for the thing the user clicked and a directional slide for steps.
+- **Technique:** View Transitions, with a shared element for the thing the user clicked and a directional slide for steps ([pattern-route-transition.md](pattern-route-transition.md)).
 - **Trap:** animating every route change the same way. Only routes with a real spatial relationship earn it.
 
 ## 8. Direct manipulation & hover

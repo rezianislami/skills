@@ -3,7 +3,7 @@ name: wow-moments
 description: Finds the few places in a built React / Next.js frontend that deserve a memorable animation, transition or micro-interaction, presents them as a ranked menu, and implements only the ones the user picks. Moment-first, not component-first - it reads product flows (first success, empty to filled, results arriving, AI working, theme switch, milestones) instead of polishing every dropdown, and enforces a per-screen budget so the result feels crafted, not AI-generated. Use when the user asks to "find wow moments", "add delight", "where should we animate", "add micro-interactions to this app", or wants new motion ideas for a frontend that already works. Not for fixing, tuning or auditing animations that already exist.
 license: MIT
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
 # Wow Moments
@@ -86,3 +86,7 @@ Worked, production-tested patterns. Adapt them; don't paste them blindly.
 | [references/pattern-cursor-preview.md](references/pattern-cursor-preview.md) | Hovered list row shows a trailing image preview |
 | [references/pattern-sliding-indicator.md](references/pattern-sliding-indicator.md) | Tabs / segmented control with one sliding pill |
 | [references/pattern-rolling-text.md](references/pattern-rolling-text.md) | Text that changes in place rolls like an odometer |
+| [references/pattern-success-check.md](references/pattern-success-check.md) | A form succeeds: confirmation takes its place, check draws, focus follows |
+| [references/pattern-error-feedback.md](references/pattern-error-feedback.md) | Invalid submit: field shakes once, error grows in place |
+| [references/pattern-list-enter.md](references/pattern-list-enter.md) | A new item arrives and the rows below glide down |
+| [references/pattern-skeleton-reveal.md](references/pattern-skeleton-reveal.md) | Results replace a skeleton in the same box, first few staggered |

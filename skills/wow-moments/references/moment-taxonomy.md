@@ -13,7 +13,7 @@ The first time the user achieves the thing the product exists for: first project
 
 - **Signals:** `onboarding`, `isFirst`, `firstRun`, `hasCompletedSetup`, a count going from 0 to 1, success routes like `/welcome` or `/done`, a create mutation followed by a redirect.
 - **Tier:** hero.
-- **Technique:** a short sequence. The check mark draws, the new item settles into its place, and the next action becomes the obvious focus. Keep it under ~1.2s total.
+- **Technique:** a short sequence. The check mark draws, the new item settles into its place, and the next action becomes the obvious focus. Keep it under ~1.2s total ([pattern-success-check.md](pattern-success-check.md)).
 - **Trap:** celebrating on *every* create. Gate it to the first time, or to genuinely rare events.
 
 ## 2. Empty → filled
@@ -22,7 +22,7 @@ A list, board or inbox that was empty gets its first item, or new items appear.
 
 - **Signals:** `items.length === 0` branches, an `EmptyState` component, optimistic inserts, `revalidate` after a mutation.
 - **Tier:** transition.
-- **Technique:** the new item enters (fade + small rise or scale from ~0.96), and siblings move with a layout animation instead of jumping. With Motion: `AnimatePresence` + `layout`.
+- **Technique:** the new item enters (fade + small rise or scale from ~0.96), and siblings move with a layout animation instead of jumping. With Motion: `AnimatePresence` + `layout` ([pattern-list-enter.md](pattern-list-enter.md)).
 - **Trap:** animating the whole list on every refetch. Animate only items whose keys are new.
 
 ## 3. Results arrive
@@ -31,7 +31,7 @@ Data replaces a loading state: search results, a report, an AI answer, a dashboa
 
 - **Signals:** `isLoading`/`isPending`, `Suspense` fallbacks, `loading.tsx`, skeleton components, `useTransition`.
 - **Tier:** transition.
-- **Technique:** cross-fade skeleton → content in place (same box, no shift). Stagger only the first ~5 items, 40–60ms apart.
+- **Technique:** content takes over from the skeleton in the same box (no shift), fading in as the skeleton leaves. Stagger only the first ~5 items, 40–60ms apart ([pattern-skeleton-reveal.md](pattern-skeleton-reveal.md)).
 - **Trap:** staggering 30 rows, or replaying the stagger on background refresh.
 
 ## 4. Waiting with meaning
@@ -85,7 +85,7 @@ Something went wrong, or is about to be removed.
 
 - **Signals:** form validation, `onError`, delete confirmations, undo handlers.
 - **Tier:** micro.
-- **Technique:** one short shake on an invalid submit, an error message that grows in place, a removed item collapsing away with an undo toast.
+- **Technique:** one short shake on an invalid submit, an error message that grows in place ([pattern-error-feedback.md](pattern-error-feedback.md)), a removed item collapsing away with an undo toast.
 - **Trap:** celebratory motion, or a shake on every keystroke.
 
 ## 10. First impression

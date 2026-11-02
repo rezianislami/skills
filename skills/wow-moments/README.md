@@ -1,88 +1,97 @@
 # wow-moments
 
-An agent skill that finds the few places in your frontend that deserve a memorable animation, lets you pick, and builds the ones you chose properly.
+**Your UI works. Now find the three moments worth animating, not the thirty.**
 
-Most AI-built interfaces animate everything: every section fades up, every card lifts, every number scrambles. That's what makes them look generated. This skill works the other way round. It reads your product's flows, finds the moments that *mean* something (the first success, an empty list getting its first item, results arriving, a theme switch), ranks them, caps them per screen, and asks you before touching code.
+<p align="center">
+  <img src="../../assets/wow-moments-demo.gif" alt="Side by side: a plain landing page, and the same page after wow-moments added a hero entrance and an animated signup confirmation" width="100%">
+</p>
 
-- **Moment-first, not component-first.** It looks for state changes users care about, not dropdowns to polish.
-- **A budget, not a buffet.** At most one hero moment and three smaller ones per screen. "Nothing here" is a valid answer.
-- **You choose.** The scan ends with a menu. Nothing is implemented until you reply with the IDs you want.
-- **Built properly.** Reduced-motion paths, correct first paint without JavaScript, no layout shift, screen-reader-safe, touch-aware, and comments that explain why.
-
-Built for **React and Next.js** (App Router and Pages Router). Works with plain CSS, Tailwind, Motion (`motion` / `framer-motion`) and View Transitions, and uses whatever your project already has.
-
-## Install
-
-With the [`skills`](https://github.com/vercel-labs/skills) CLI:
+Most AI-built interfaces animate everything: every section fades up, every card lifts, every number scrambles. That's exactly what makes them look generated. This skill works the other way round. It reads your product's flows, finds the moments that *mean* something, ranks them, caps them per screen, and asks you before touching a line of code.
 
 ```bash
 npx skills add rezianislami/skills --skill wow-moments
 ```
 
-Or copy this folder (`skills/wow-moments/`) into your agent's skills folder:
+## How it works
+
+```
+ 1. Intake    reads package.json and the motion you already have; asks at most two questions
+      │
+ 2. Scan      every screen → its state changes → 11 moment types → scored and budgeted
+      │
+ 3. Menu ⛔   ranked candidates with file:line, trigger, technique and reduced-motion behaviour
+      │       … then it stops. Nothing changes until you pick.
+      │
+ 4. Build     only your picks, lightest technique first; then typecheck, build and verify
+```
+
+## What makes it different
+
+| | |
+|---|---|
+| **Moment-first** | It looks for state changes users care about (first success, empty → filled, results arriving), not dropdowns to polish. |
+| **A budget, not a buffet** | At most one hero and three smaller moments per screen. "Nothing here" is a valid answer, and it tells you what it rejected and why. |
+| **You choose** | The scan ends with a menu. Nothing is implemented until you reply with IDs. |
+| **Built properly** | Reduced-motion path, correct first paint without JavaScript, no layout shift, screen-reader-safe, touch-aware, and comments that explain *why*. |
+| **Uses what you have** | Plain CSS, Tailwind, Motion (`motion` / `framer-motion`) or View Transitions, whichever your project already uses. No surprise dependencies. |
+
+## A real menu
+
+Abridged, from a run on the [`landing-page`](../../examples/wow-moments/landing-page) fixture:
+
+| ID | Moment | Tier | Score | Effort |
+|---|---|---|---|---|
+| A1 ★ | Signup succeeds: a check mark draws and the confirmation settles in place | hero | 11 | S |
+| A2 ★ | Hero entrance: headline, subline, form fade in from a slight blur on first paint | transition | 9 | S |
+| A3 | Invalid email: the input shakes once and the error changes in place | micro | 8 | S |
+
+Picking `A1, A2` produced [`landing-page-after`](../../examples/wow-moments/landing-page-after), the right-hand side of the GIF above.
+
+## Patterns included
+
+| Pattern | Moment |
+|---|---|
+| Scroll reveal | Sections unfold on first paint or first scroll into view |
+| Theme sweep | Theme switch spreads as a soft circle from the toggle |
+| Count-up | Key numbers count up once when first seen |
+| Cursor preview | Hovered list row shows a trailing image |
+| Sliding indicator | Tabs or segmented control with one sliding pill |
+| Rolling text | Text that changes in place rolls like an odometer |
+| Success check | Confirmation takes the form's place, check draws, focus follows |
+| Error feedback | Field shakes once, error grows in place |
+| List enter | New item arrives, the rows below glide down |
+| Skeleton reveal | Results replace a skeleton in the same box |
+
+Every pattern explains *why* it's built that way, and its code is typechecked.
+
+## Install
+
+```bash
+npx skills add rezianislami/skills --skill wow-moments
+```
+
+Or copy this folder into your agent's skills folder:
 
 | Agent | Project | Personal |
 |---|---|---|
 | Claude Code | `.claude/skills/wow-moments/` | `~/.claude/skills/wow-moments/` |
 | Codex | `.agents/skills/wow-moments/` | `~/.agents/skills/wow-moments/` |
 
-The skill follows the open [Agent Skills](https://agentskills.io/specification) format, so other compatible agents can load it too.
+Built for **React and Next.js** (App Router and Pages Router). Then, once your UI is built, ask:
 
-## Use
+> The UI is done. Find wow moments in it.
 
-Build your UI first, then ask your agent something like:
+## Try it on a fixture
 
-> Find wow moments in this app.
+Motion-free fixtures live in [`examples/wow-moments`](../../examples/wow-moments):
 
-> Where should we add micro-interactions? The UI is done.
-
-You get a menu like this:
-
-```markdown
-### A. Projects (`/projects`)
-
-| ID | Moment | Tier | Score | Effort |
-|---|---|---|---|---|
-| A1 ★ | First project scanned → card draws in, CTA takes focus | hero | 12 | M |
-| A2 ★ | Scan status label rolls to each real step | micro | 9 | S |
-| A3 | Invalid name → one short shake | micro | 7 | S |
-
-### Considered, not recommended
-- Hover lift on project cards: plays dozens of times a session, carries no information
-```
-
-Reply with `A1, A2` (or `recommended`) and the agent implements just those, then verifies the build, the reduced-motion path and first paint.
-
-## What's inside
-
-```
-skills/wow-moments/
-├── SKILL.md                     # workflow and hard rules
-└── references/
-    ├── moment-taxonomy.md       # 11 moment types and the code signals that reveal them
-    ├── scoring.md               # meaning × rarity × visibility − cost, and tiers
-    ├── budget.md                # how many moments, and where
-    ├── anti-slop.md             # what not to propose, and why
-    ├── candidate-format.md      # the menu
-    ├── implementation-react.md  # CSS vs Motion vs View Transitions vs rAF
-    ├── motion-scale.md          # durations, easings, stagger, distances
-    ├── guardrails.md            # the checklist every moment must pass
-    └── pattern-*.md             # six worked, production-tested patterns
-```
-
-Patterns: scroll reveal, theme sweep, count-up, cursor-follow preview, sliding indicator, rolling text.
-
-## Try it on the fixture
-
-[`examples/wow-moments/sample-next-app`](../../examples/wow-moments/sample-next-app) in the collection repo is a small Next.js app with no motion at all, built to contain one of each common moment, plus a restraint check:
+- `landing-page`: a one-page marketing site.
+- `sample-next-app`: a small app with an empty state, a long-running job, tabs and a theme toggle. Its README lists what a good scan should find, so copy the app elsewhere without that README before you test.
 
 ```bash
-cd examples/wow-moments/sample-next-app
-npm install
-npm run build
+cd examples/wow-moments/landing-page
+npm install && npm run dev
 ```
-
-Then point your agent at that folder and ask for wow moments. The fixture's README lists what a good scan should find. Copy the app somewhere else without that README before you test, or the agent can read the answers.
 
 ## License
 

@@ -189,6 +189,115 @@ watch(
 
 CSS as in [pattern-skeleton-reveal.md](pattern-skeleton-reveal.md).
 
+## Optimistic update (`pattern-optimistic-update`)
+
+Vue's reactivity is synchronous, so the React version's refs-beside-state split isn't needed: plain variables hold the confirmed value and the request counter.
+
+```ts
+import { shallowRef } from "vue";
+
+export function useOptimisticValue<T>(initial: T, save: (next: T) => Promise<void>) {
+  const value = shallowRef(initial);
+  const error = shallowRef("");
+  let confirmed = initial;
+  let latest = 0;
+
+  async function set(next: T) {
+    const request = ++latest;
+    value.value = next;
+    error.value = "";
+    try {
+      await save(next);
+      confirmed = next;
+    } catch {
+      // A newer request is in flight; its own result decides what to show.
+      if (request !== latest) return;
+      value.value = confirmed;
+      error.value = "Couldn't save. It's back to how it was.";
+    }
+  }
+
+  return { value, error, set };
+}
+```
+
+Bind `:checked="value"` and `@change="set(!value)"`, and render `error` in an always-mounted `<p role="alert">`. With Pinia Colada or TanStack Vue Query, use their `onMutate` / `onError` rollback instead.
+
+## Undo instead of confirm (`pattern-undo-remove`)
+
+```ts
+import { onBeforeUnmount, onMounted, shallowRef } from "vue";
+
+// Long enough to read the toast and reach the button; paused on hover/focus.
+const UNDO_MS = 6000;
+
+export function useUndoableRemove<T>(commit: (item: T) => void) {
+  const pending = shallowRef<T | null>(null);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+
+  function flush() {
+    clearTimeout(timer);
+    const item = pending.value;
+    pending.value = null;
+    if (item !== null) commit(item);
+  }
+
+  function remove(item: T) {
+    flush();
+    pending.value = item;
+    timer = setTimeout(flush, UNDO_MS);
+  }
+
+  function undo() {
+    clearTimeout(timer);
+    pending.value = null;
+  }
+
+  const pause = () => clearTimeout(timer);
+  function resume() {
+    clearTimeout(timer);
+    if (pending.value !== null) timer = setTimeout(flush, UNDO_MS);
+  }
+
+  // Leaving the page or the component commits; only Undo cancels.
+  onMounted(() => window.addEventListener("pagehide", flush));
+  onBeforeUnmount(() => {
+    window.removeEventListener("pagehide", flush);
+    flush();
+  });
+
+  return { pending, remove, undo, pause, resume };
+}
+```
+
+The toast markup and CSS are the ones in [pattern-undo-remove.md](pattern-undo-remove.md): an always-mounted `role="status"` region, `@mouseenter`/`@focusin` → `pause`, `@mouseleave`/`@focusout` → `resume`. In Nuxt, `<Teleport to="body">` keeps the fixed toast out of any transformed ancestor.
+
+## Keyboard shortcut (`pattern-keyboard-shortcut`)
+
+```ts
+import { onBeforeUnmount, onMounted, toValue, type MaybeRefOrGetter } from "vue";
+
+function isTyping(target: EventTarget | null) {
+  if (!(target instanceof HTMLElement)) return false;
+  return target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName);
+}
+
+// `enabled` is read on every key press, so a user setting can turn
+// single-key shortcuts off without re-registering anything.
+export function useShortcut(key: string, run: () => void, enabled: MaybeRefOrGetter<boolean> = true) {
+  const onKey = (e: KeyboardEvent) => {
+    if (!toValue(enabled) || e.key !== key || e.repeat || e.defaultPrevented) return;
+    if (e.ctrlKey || e.metaKey || e.altKey || isTyping(e.target)) return;
+    e.preventDefault();
+    run();
+  };
+  onMounted(() => document.addEventListener("keydown", onKey));
+  onBeforeUnmount(() => document.removeEventListener("keydown", onKey));
+}
+```
+
+`Ctrl/⌘+Enter` in a textarea: `@keydown.enter.exact` won't match with a modifier, so use `@keydown.ctrl.enter` and `@keydown.meta.enter` calling `form.requestSubmit()`.
+
 ## Route transitions in Nuxt
 
 ```ts nocheck

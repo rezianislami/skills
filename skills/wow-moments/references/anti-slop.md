@@ -32,6 +32,15 @@ The first group comes from real design reviews, where each was tried on a produc
 - Page transitions on every route, including ones with no spatial relationship.
 - Scroll hijacking / smooth-scroll libraries that change scroll speed, unless the user explicitly wants them.
 
+## Interaction slop
+
+- A command palette in an app with a handful of pages. It's a second, hidden navigation for nothing.
+- A toast for every action ("Saved!", "Updated!"), including ones whose result is already visible on screen.
+- Tooltips on every icon and every label, instead of clear labels.
+- Keyboard shortcuts with no hint anywhere in the UI.
+- Autosave with no visible saved state, so the user can't tell whether it worked.
+- Onboarding tours that point at every button on the first visit.
+
 ## Test before proposing
 
 1. **Remove test:** if the moment disappeared, would anyone miss the *information* it carried? If not, it's decoration. Decoration is allowed only as the one signature motif.

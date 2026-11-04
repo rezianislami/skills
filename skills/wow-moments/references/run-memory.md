@@ -8,7 +8,10 @@ The memory is one small markdown file in the project root, `.wow-moments.md`. It
 
 - **Phase 1:** if `.wow-moments.md` exists, read it before scanning. Its motion language overrides the defaults in [motion-scale.md](motion-scale.md). Only the project's actual code wins over it; if they disagree, say so in the menu.
 - **Phase 3:** don't re-propose anything under *Declined* unless the code it depended on has changed. List matches in one line at the end of the menu ("Skipped, declined before: hover lift on cards").
-- **Phase 4:** after implementing, create or update the file. Mention it in your report; the user can delete it if they don't want it.
+- **Phase 3:** don't list a quiet-down candidate the user already kept (under *Declined*), and don't re-propose motion you already removed (under *Quieted*).
+- **Phase 5:** after building, create or update the file. Mention it in your report; the user can delete it if they don't want it.
+
+Previews (`.wow-moments-preview/`) are throwaway and are never recorded here.
 
 ## Format
 
@@ -24,6 +27,10 @@ The memory is one small markdown file in the project root, `.wow-moments.md`. It
 ## Built
 - 2026-11-02 · Signup success: check draws, confirmation takes the form's place (`components/signup.tsx`)
 - 2026-11-02 · Hero entrance, CSS only (`app/globals.css`, `.hero`)
+- 2026-11-04 · Task checkbox saves instantly, rolls back on error (`components/task-row.tsx`), test in `components/task-row.test.tsx`
+
+## Quieted
+- 2026-11-04 · Hover lift on project cards removed, colour change kept (`components/project-card.tsx`)
 
 ## Declined
 - 2026-11-02 · Monthly/yearly price roll: "price is read once, not worth it"

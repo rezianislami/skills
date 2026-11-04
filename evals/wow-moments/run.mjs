@@ -6,8 +6,10 @@
 //
 // Phase "scan" always runs: the skill must trigger on its own, stop at a
 // menu, change no files, keep to the budget and cite file:line that exist.
-// With --pick, the same session continues with those IDs and the harness then
-// builds the app itself and inspects the diff.
+// With --pick, the same session continues with those IDs: the skill must give
+// a verdict on every pick and stop again without changing files. Then "go"
+// continues to the build, and the harness builds the app itself and inspects
+// the diff.
 //
 // Costs real tokens (roughly $0.5–2 per run), so it's run by hand before a
 // release, not on every push. Needs the `claude` CLI, logged in.
@@ -127,9 +129,19 @@ check(
 
 let build;
 if (pick) {
-  console.log(`phase 2: implement ${pick}…`);
+  // Write tools are allowed here on purpose: stopping at the verdict has to be
+  // the skill's own choice, not something the harness forces.
+  console.log(`phase 2: verdict on ${pick}…`);
+  const verdict = claude([pick, "--resume", scan.result.session_id], WRITE_TOOLS);
+  const verdictText = verdict.result.result ?? "";
+  check("no files changed at the verdict", sh("git", ["status", "--porcelain"]).trim() === "");
+  const ids = pick.split(/[\s,]+/).filter(Boolean);
+  const unjudged = ids.filter((id) => !new RegExp(`\\b${id}\\b[^\\n]*\\b(GO|SWAP)\\b`).test(verdictText));
+  check("every pick has a verdict", unjudged.length === 0, unjudged.length ? `missing: ${unjudged.join(", ")}` : "");
+
+  console.log("phase 3: build…");
   const before = readFileSync(join(work, "package.json"), "utf8");
-  const impl = claude([pick, "--resume", scan.result.session_id], WRITE_TOOLS);
+  const impl = claude(["go", "--resume", verdict.result.session_id], WRITE_TOOLS);
   // Intent-to-add puts new files into `git diff` with their full contents;
   // without it the content checks below only see edits to existing files.
   sh("git", ["add", "-N", "."]);
@@ -145,7 +157,10 @@ if (pick) {
 
   build = spawnSync("npm", ["run", "build"], { cwd: work, encoding: "utf8" });
   check("app still builds", build.status === 0, build.status === 0 ? "" : build.stdout.slice(-800));
-  checks.cost = (scan.result.total_cost_usd ?? 0) + (impl.result.total_cost_usd ?? 0);
+  check("report has a PASS/FAIL verdict", /\b(PASS|FAIL)\b/.test(impl.result.result ?? ""));
+  checks.cost =
+    (scan.result.total_cost_usd ?? 0) + (verdict.result.total_cost_usd ?? 0) + (impl.result.total_cost_usd ?? 0);
+  checks.verdict = verdictText;
   checks.implementReport = impl.result.result ?? "";
 } else {
   checks.cost = scan.result.total_cost_usd ?? 0;
@@ -159,6 +174,7 @@ writeFileSync(join(out, "menu.md"), menu);
 // --- report ----------------------------------------------------------------
 console.log("");
 for (const c of checks) console.log(`${c.ok ? "✓" : "✗"} ${c.name}${c.detail ? `  (${c.detail})` : ""}`);
+if (checks.verdict) writeFileSync(join(out, "verdict.md"), checks.verdict);
 if (checks.implementReport) writeFileSync(join(out, "implement-report.md"), checks.implementReport);
 writeFileSync(join(out, "checks.json"), JSON.stringify({ fixture, pick, cost: checks.cost, checks }, null, 2));
 console.log(`\ncost: $${checks.cost.toFixed(2)}   results: ${out}`);

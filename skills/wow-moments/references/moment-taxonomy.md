@@ -6,6 +6,7 @@ Tiers (defined fully in [scoring.md](scoring.md)):
 - **hero**: rare, big, the thing people remember.
 - **transition**: explains a change of state or place.
 - **micro**: small feedback on a frequent action.
+- **interaction**: not an animation. The app behaves better than expected: faster, more forgiving, fewer steps (types 12–17).
 
 ## 1. First success
 
@@ -106,9 +107,62 @@ Rare achievements: plan upgraded, goal reached, streak, 100%.
 - **Technique:** a one-time sequence tied to the brand motif. Confetti only when the brand is playful *and* the event is rare.
 - **Trap:** milestone celebrations on routine actions.
 
+# Interaction wow (non-motion)
+
+Some of the strongest "this app is good" reactions involve no animation at all: the app answers before the server does, forgives a mistake, or saves a step. These types change behaviour, often the data flow, so they carry more risk than motion. Each one gets its own guardrails (12–15 in [guardrails.md](guardrails.md)) and, when it changes how data is written, a test of its failure path.
+
+## 12. Instant response (optimistic UI)
+
+A frequent, low-risk write that currently waits for the server: toggle a checkbox, star, like, rename, reorder.
+
+- **Signals:** a spinner or `disabled` state on a toggle while `await save()` runs, `router.refresh()` / `revalidate` after a small mutation, `useMutation` without `onMutate`, `isPending` on a checkbox.
+- **Technique:** change the UI at once, send the write, roll back and say so if it fails ([pattern-optimistic-update.md](pattern-optimistic-update.md)).
+- **Trap:** optimistic money, permission or irreversible actions, or writes that often fail validation. Those should wait for the server.
+
+## 13. Undo instead of "Are you sure?"
+
+A destructive action guarded by a confirmation dialog the user clicks through on autopilot.
+
+- **Signals:** `confirm(`, `AlertDialog` / `ConfirmDialog` around delete, archive or remove; "Are you sure" copy.
+- **Technique:** remove at once, show a toast with **Undo** for a few seconds, and commit only when the window closes, or delete and restore if the API supports it ([pattern-undo-remove.md](pattern-undo-remove.md)).
+- **Trap:** undo on effects that already left the building (an email sent, a payment made, a webhook fired). Keep the confirmation there.
+
+## 14. Keyboard flow
+
+Screens people use for a long time, where the mouse is the slow path: lists, inboxes, editors, search.
+
+- **Signals:** a search box on a page people come back to, lists with per-row actions, forms with a long textarea, existing `onKeyDown` handlers, `cmdk` already installed.
+- **Technique:** `/` focuses search, `Esc` closes and returns focus, `Ctrl/⌘+Enter` submits a textarea, `j`/`k` move through a list; the key is shown in the UI ([pattern-keyboard-shortcut.md](pattern-keyboard-shortcut.md)). A command palette only when there are roughly ten or more destinations or actions to jump to.
+- **Trap:** a command palette in a three-page app, shortcuts nobody can discover, and single-key shortcuts that can't be turned off (guardrail 14).
+
+## 15. Empty state that starts the work
+
+An empty list that only says "No items yet".
+
+- **Signals:** `items.length === 0` branches that render a sentence and nothing else, an `EmptyState` with an illustration but no action.
+- **Technique:** one primary action that creates the first item, a sample or template to start from, or a paste/drop target; the copy says what the screen will hold. Pairs with *Empty → filled* (type 2) for the moment the first item arrives.
+- **Trap:** a big illustration and a joke, with the action buried below.
+
+## 16. Remembered state
+
+The app forgets things the user chose: filters, sort order, the open tab, a half-written form.
+
+- **Signals:** filter, sort or tab state in `useState` / `ref` that resets on reload or back navigation; long forms with no draft.
+- **Technique:** filters, sort and tabs go into the URL search params (shareable, and Back works); long free-text forms keep a draft in `localStorage` and say "Draft restored" with a way to discard it.
+- **Trap:** storing passwords, payment or personal data in `localStorage`; restoring a stale draft silently over newer server data.
+
+## 17. Fewer steps
+
+A whole page or dialog for something that could happen in place.
+
+- **Signals:** an edit route for a single field, an upload that only has a file-picker button, a search with a submit button over a list that's already loaded, a multi-step form that asks for things it could infer.
+- **Technique:** inline edit (click the text, `Enter` saves, `Esc` cancels), paste or drop a file onto the page, filter as you type over loaded data, smart defaults.
+- **Trap:** inline edit with no visible affordance, or that saves on blur without telling the user.
+
 ## Scan checklist per screen
 
 1. Which states can this screen be in? (loading, empty, filled, error, success)
 2. What is the one action the screen exists for?
 3. What happens visually right after that action today? Is the change *explained*, or does content just swap?
 4. Is anything here seen for the first time, or achieved for the first time?
+5. Where does the user wait, confirm, retype or repeat themselves? That's where an interaction moment lives.

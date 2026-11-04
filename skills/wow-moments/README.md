@@ -3,7 +3,7 @@
 **Your UI works. Now find the three moments worth animating, not the thirty.**
 
 <p align="center">
-  <img src="../../assets/wow-moments-demo.gif" alt="Side by side: a plain landing page, and the same page after wow-moments added a hero entrance and an animated signup confirmation" width="100%">
+  <img src="../../assets/wow-moments-demo.gif" alt="Side by side: a signup form built with Rezi UI, before and after wow-moments. Before, the form is swapped for plain text on submit; after, the form enters with a soft blur and the confirmation settles in place as a check mark draws" width="100%">
 </p>
 
 Most AI-built interfaces animate everything: every section fades up, every card lifts, every number scrambles. That's exactly what makes them look generated. This skill works the other way round. It reads your product's flows, finds the moments that *mean* something, ranks them, caps them per screen, and asks you before touching a line of code.
@@ -18,13 +18,18 @@ npx skills add rezianislami/skills --skill wow-moments
  1. Intake    reads .wow-moments.md, package.json and the motion you already have;
       │       asks at most two questions
       │
- 2. Scan      every screen → its state changes → 11 moment types → scored and budgeted
+ 2. Scan      every screen → its state changes and friction → 11 motion + 6 interaction
+      │       moment types → scored and budgeted; generic motion noted for quiet-down
       │
- 3. Menu ⛔   ranked candidates with file:line, trigger, technique and reduced-motion behaviour
+ 3. Menu ⛔   ranked candidates with file:line, trigger, technique, reduced-motion or
+      │       failure behaviour, plus up to 5 existing animations to quiet down
       │       … then it stops. Nothing changes until you pick.
       │
- 4. Build     only your picks, lightest technique first; then typecheck, build,
-              run scripts/verify.mjs, and update .wow-moments.md
+ 4. Verdict ⛔ GO / GO with a note / SWAP per pick, judged as a set, with a storyboard;
+      │       `preview A1` writes a throwaway HTML preview. Stops until you say go.
+      │
+ 5. Build     only what you confirmed, lightest technique first; then typecheck, build,
+              verify.mjs, failure-path tests, a PASS/FAIL verdict, and .wow-moments.md
 ```
 
 ## What makes it different
@@ -33,7 +38,9 @@ npx skills add rezianislami/skills --skill wow-moments
 |---|---|
 | **Moment-first** | It looks for state changes users care about (first success, empty → filled, results arriving), not dropdowns to polish. |
 | **A budget, not a buffet** | At most one hero and three smaller moments per screen. "Nothing here" is a valid answer, and it tells you what it rejected and why. |
-| **You choose** | The scan ends with a menu. Nothing is implemented until you reply with IDs. |
+| **Not only motion** | Some of the best moments are behaviour: a checkbox that saves instantly and rolls back on failure, undo instead of "Are you sure?", `/` to search, filters that survive a reload. |
+| **Quiet down** | Vibe-coded apps often animate everything. The menu can list up to five existing animations that compete with your best moment, and removes them only if you pick them. |
+| **You choose, then it tells you what it thinks** | The scan ends with a menu. Your picks get a verdict and a storyboard, and a live HTML preview on request, before a line of code changes. |
 | **Built properly** | Reduced-motion path, correct first paint without JavaScript, no layout shift, screen-reader-safe, touch-aware, and comments that explain *why*. |
 | **Remembers** | A small `.wow-moments.md` in your repo records the motion language, what was built and what you declined. The next run matches the signature and doesn't pitch rejected ideas again. |
 | **React and Vue** | React / Next.js and Vue / Nuxt, with the Vue versions of the patterns checked in a real browser. |
@@ -49,7 +56,7 @@ Abridged, from a run on the [`landing-page`](../../examples/wow-moments/landing-
 | A2 ★ | Hero entrance: headline, subline, form fade in from a slight blur on first paint | transition | 9 | S |
 | A3 | Invalid email: the input shakes once and the error changes in place | micro | 8 | S |
 
-Picking `A1, A2` produced [`landing-page-after`](../../examples/wow-moments/landing-page-after), the right-hand side of the GIF above.
+Picking `A1, A2` produced [`landing-page-after`](../../examples/wow-moments/landing-page-after). The GIF above shows the same two moments on a [Rezi UI](https://reziui.rezianislami.workers.dev) signup form.
 
 ## Patterns included
 
@@ -67,6 +74,9 @@ Picking `A1, A2` produced [`landing-page-after`](../../examples/wow-moments/land
 | Skeleton reveal | Results replace a skeleton in the same box |
 | Streaming answer | AI answer streams: real step status, stick-to-bottom, quiet finish |
 | Route transition | List → detail: the clicked item travels, the page slides by direction |
+| Optimistic update | A write shows at once, rolls back to the confirmed value on failure |
+| Undo instead of confirm | Delete with an undo toast; deferred commit, nothing lost |
+| Keyboard shortcut | `/` to search, `Ctrl/⌘+Enter` to send; never while typing, can be turned off |
 
 Every pattern explains *why* it's built that way, and its code is typechecked in CI.
 
@@ -89,7 +99,7 @@ Works with **React / Next.js** (App Router and Pages Router) and **Vue / Nuxt**.
 
 ## Verify a moment
 
-The skill runs this itself in Phase 4, but you can run it too, against any running page:
+The skill runs this itself in Phase 5, but you can run it too, against any running page:
 
 ```bash
 node skills/wow-moments/scripts/verify.mjs http://localhost:3000/ \

@@ -5,7 +5,7 @@
 **Agent skills for interfaces that feel designed, not generated.**
 
 [![check](https://github.com/rezianislami/skills/actions/workflows/check.yml/badge.svg)](https://github.com/rezianislami/skills/actions/workflows/check.yml)
-[![wow-moments](https://img.shields.io/badge/wow--moments-v0.3.0-0063d7?style=flat-square)](skills/wow-moments)
+[![wow-moments](https://img.shields.io/badge/wow--moments-v0.4.0-0063d7?style=flat-square)](skills/wow-moments)
 [![Agent Skills](https://img.shields.io/badge/format-Agent%20Skills-555?style=flat-square)](https://agentskills.io/specification)
 [![MIT license](https://img.shields.io/badge/license-MIT-f4c430?style=flat-square)](LICENSE)
 
@@ -16,7 +16,7 @@
 </div>
 
 <p align="center">
-  <img src="assets/wow-moments-demo.gif" alt="Side by side: a plain landing page, and the same page after wow-moments added a hero entrance and an animated signup confirmation" width="100%">
+  <img src="assets/wow-moments-demo.gif" alt="Side by side: a signup form built with Rezi UI, before and after wow-moments. Before, the form is swapped for plain text on submit; after, the form enters with a soft blur and the confirmation settles in place as a check mark draws" width="100%">
 </p>
 
 Built for Claude Code, Codex and any agent that reads the open [Agent Skills](https://agentskills.io/specification) format. Each skill is opinionated, small enough to read in one sitting, and tested on a real app before it ships.
@@ -44,7 +44,7 @@ No CLI? Copy a folder from [`skills/`](skills) into your agent's skills folder:
 
 > Your UI works. Now find the three moments worth animating, not the thirty.
 
-Scans a built React / Next.js or Vue / Nuxt frontend for the moments that *mean* something: a first success, an empty list getting its first item, results arriving, a theme switch. It ranks them, caps them per screen, and hands you a menu. You pick; it builds only those, with reduced-motion, no-JS and accessibility guardrails, then verifies the result.
+Scans a built React / Next.js or Vue / Nuxt frontend, hand-written or vibe-coded, for the moments that *mean* something: a first success, an empty list getting its first item, results arriving, a theme switch. It also finds non-motion wins (a write that answers instantly, undo instead of "Are you sure?", keyboard shortcuts) and generic animations worth quieting down. It ranks them, caps them per screen, and hands you a menu. You pick, it gives a verdict and a storyboard (a live preview if you ask), and after you confirm it builds only those, with reduced-motion, no-JS, accessibility and failure-path guardrails, and reports PASS/FAIL per moment.
 
 ```text
 You:    The page is done. Find wow moments in it.
@@ -56,10 +56,15 @@ Agent:  A1 ★  Signup succeeds: a check mark draws, the confirmation settles in
 
 You:    A1, A2
 
-Agent:  implements both, then typechecks, builds and checks the reduced-motion path
+Agent:  A1 GO · A2 GO, with a note (second motion on the same form; keep it short)
+        storyboards for both … reply `go`, or `preview A1`
+
+You:    go
+
+Agent:  builds both, typechecks, builds, runs verify.mjs → A1 PASS · A2 PASS
 ```
 
-Abridged from a real run on the [`landing-page`](examples/wow-moments/landing-page) fixture; the GIF above shows the result.
+The menu is abridged from a real run on the [`landing-page`](examples/wow-moments/landing-page) fixture; the verdict and PASS lines show the v0.4 flow. The GIF above shows the same two moments built on a [Rezi UI](https://reziui.rezianislami.workers.dev) signup form, recorded from the live demo on [portfolio.rezianislami.workers.dev/skills](https://portfolio.rezianislami.workers.dev/skills/).
 
 12 worked patterns · React and Vue · remembers your motion language between runs · a guardrail checker · evaluated end to end with a real agent
 
@@ -101,6 +106,7 @@ assets/             images for these READMEs
 ## Roadmap
 
 - [ ] A Nuxt fixture, so the Vue patterns are evaluated end to end with SSR, like the React ones
+- [ ] A fixture with interaction opportunities (a confirm-to-delete, a slow toggle, filters that reset), so the interaction tier is evaluated end to end
 - [ ] Svelte / SvelteKit implementation guide
 - [ ] Public release on [skills.sh](https://skills.sh)
 - [ ] More skills in this collection

@@ -67,7 +67,7 @@ For each confirmed moment:
    - run [scripts/verify.mjs](scripts/verify.mjs) against the running app when Playwright is available. It checks first paint without JS, reduced motion, layout shift and leftover transforms. Use `--fill` / `--click` to trigger the moment. If Playwright isn't installed, ask before adding it, or check the same four points by hand;
    - interaction moments that change how data is written: add the failure-path test from guardrail 15 in the project's runner, and run it;
    - if a browser tool is available, trigger the moment and look at it, once normally and once with reduced motion emulated.
-6. Report the final verdict table from [references/verdict-and-preview.md](references/verdict-and-preview.md) (PASS / PASS checked by hand / FAIL, with evidence), then per moment: the files touched, what happens, the reduced-motion or failure behaviour, and the one constant to change to tune it.
+6. Report the final verdict table from [references/verdict-and-preview.md](references/verdict-and-preview.md) (PASS / PASS checked by hand / FAIL / NOT VERIFIED, with evidence), then per moment: the files touched, what happens, the reduced-motion or failure behaviour, and the one constant to change to tune it.
 7. Create or update `.wow-moments.md` (motion language, built, quieted, declined) as described in [references/run-memory.md](references/run-memory.md), and mention it in the report.
 
 ## Reference map

@@ -61,9 +61,13 @@ After building, one line per moment, based only on what was actually run:
 | A1 | PASS | build ✓, verify.mjs 4/4 ✓, looked at it with reduced motion |
 | A2 | PASS, checked by hand | build ✓; no test runner, rollback checked by blocking the request |
 | B1 | FAIL | CLS 0.14: the number's width changes; fixed width next |
+| C2 | NOT VERIFIED | build ✓; no Playwright and no browser here, so reduced motion, first paint and layout shift were not run |
 ```
+
+Use exactly these four labels, so every run reports the same way:
 
 - **PASS** only when the typecheck/build passed and the guardrail checks for that moment ran and passed.
 - **PASS, checked by hand** when part of the evidence is a manual check. Say which part.
 - **FAIL** with the failing check and the next step. Don't report a FAIL as done.
+- **NOT VERIFIED** when the build passed but the guardrail checks couldn't run at all, neither `verify.mjs` nor by hand (no Playwright, no browser tool). List what wasn't run and how the user can check it. It is not a pass.
 - A check that didn't run is listed as not run, never as passed.

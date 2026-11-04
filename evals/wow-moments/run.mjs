@@ -130,7 +130,10 @@ if (pick) {
   console.log(`phase 2: implement ${pick}…`);
   const before = readFileSync(join(work, "package.json"), "utf8");
   const impl = claude([pick, "--resume", scan.result.session_id], WRITE_TOOLS);
-  const diff = sh("git", ["diff"]) + sh("git", ["ls-files", "--others", "--exclude-standard"]);
+  // Intent-to-add puts new files into `git diff` with their full contents;
+  // without it the content checks below only see edits to existing files.
+  sh("git", ["add", "-N", "."]);
+  const diff = sh("git", ["diff"]);
 
   check("files changed", diff.trim() !== "");
   check("no new dependencies", readFileSync(join(work, "package.json"), "utf8") === before);

@@ -73,7 +73,9 @@ const report = (ok, name, detail) => results.push({ ok, name, detail });
 
 async function trigger(page) {
   if (fill) {
-    const at = fill.indexOf("=");
+    // Split on the last "=": attribute selectors like input[type=email] contain
+    // one, typed text rarely does.
+    const at = fill.lastIndexOf("=");
     await page.fill(fill.slice(0, at), fill.slice(at + 1));
   }
   if (click) await page.click(click);
@@ -92,8 +94,9 @@ async function trigger(page) {
       const r = el.getBoundingClientRect();
       if (!r.width || !r.height || r.top > innerHeight) continue;
       if (!el.textContent?.trim() || el.children.length > 3) continue;
-      const s = getComputedStyle(el);
-      if (s.opacity === "0" || s.visibility === "hidden") out.push(el.tagName.toLowerCase() + (el.className ? "." + String(el.className).split(" ")[0] : ""));
+      // opacity isn't inherited, so the element's own computed style misses a
+      // hidden wrapper; checkVisibility also looks at every ancestor.
+      if (!el.checkVisibility({ opacityProperty: true, visibilityProperty: true })) out.push(el.tagName.toLowerCase() + (el.className ? "." + String(el.className).split(" ")[0] : ""));
     }
     return out.slice(0, 5);
   });
@@ -105,11 +108,9 @@ async function trigger(page) {
 {
   const ctx = await browser.newContext({ reducedMotion: "reduce" });
   const page = await ctx.newPage();
-  await page.goto(url, { waitUntil: "networkidle" });
-  await trigger(page);
-  await page.waitForTimeout(100);
-  const moving = await page.evaluate(() =>
-    document
+  const running = () =>
+    page.evaluate(() =>
+      document
       .getAnimations()
       .filter((a) => a.playState === "running" && Number(a.effect?.getTiming().duration) > 0)
       // Infinite loops (skeleton shimmer, spinners) are judged by their own CSS
@@ -119,8 +120,20 @@ async function trigger(page) {
         (a.effect?.getKeyframes() ?? []).some((k) => "transform" in k || "translate" in k || "scale" in k || "filter" in k),
       )
       .map((a) => a.animationName || a.transitionProperty || "script animation"),
-  );
-  report(moving.length === 0, "reduced motion stops movement", moving.join(", "));
+    );
+  // Sampled at three points: an entrance that plays on load is usually over
+  // by networkidle (500 ms with no requests), so one sample after the trigger
+  // would never see it.
+  const moving = new Set();
+  await page.goto(url, { waitUntil: "domcontentloaded" });
+  for (const name of await running()) moving.add(name);
+  await page.waitForLoadState("load");
+  for (const name of await running()) moving.add(name);
+  await page.waitForLoadState("networkidle");
+  await trigger(page);
+  await page.waitForTimeout(100);
+  for (const name of await running()) moving.add(name);
+  report(moving.size === 0, "reduced motion stops movement", [...moving].join(", "));
   await ctx.close();
 }
 
@@ -130,8 +143,10 @@ async function trigger(page) {
   const page = await ctx.newPage();
   await page.addInitScript(() => {
     window.__cls = 0;
+    // hadRecentInput is not filtered out, unlike real CLS: it marks every shift
+    // in the 500 ms after a click, which is exactly when a --click moment plays.
     new PerformanceObserver((list) => {
-      for (const e of list.getEntries()) if (!e.hadRecentInput) window.__cls += e.value;
+      for (const e of list.getEntries()) window.__cls += e.value;
     }).observe({ type: "layout-shift", buffered: true });
   });
   await page.goto(url, { waitUntil: "networkidle" });

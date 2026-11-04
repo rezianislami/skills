@@ -21,6 +21,12 @@ jobs:
         working-directory: tools
       - name: Validate skills (frontmatter, links)
         run: node tools/check-skills.mjs
+      - name: Install Chromium for the verify.mjs tests
+        run: npx playwright install --with-deps chromium
+        working-directory: tools
+      - name: Test verify.mjs in a real browser
+        run: npm test
+        working-directory: tools
       - name: Typecheck code blocks in skills
         run: node tools/check-snippets.mjs
       # Test fixtures are only useful while they have nothing to find already.

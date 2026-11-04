@@ -94,7 +94,7 @@ Yes. A small `.wow-moments.md` in your project records the motion language, what
 skills/<name>/      the skill itself: SKILL.md, references/, README.md
 examples/<name>/    test fixtures (not installed with the skill)
 evals/<name>/       end-to-end agent evals (run by hand, cost tokens)
-tools/              CI checks: skill format, links, typechecked code blocks
+tools/              CI checks: skill format, links, typechecked code blocks, browser tests for skill scripts
 assets/             images for these READMEs
 ```
 

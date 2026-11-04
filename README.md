@@ -16,7 +16,7 @@
 </div>
 
 <p align="center">
-  <img src="assets/wow-moments-demo.gif" alt="Side by side: a plain landing page, and the same page after wow-moments added a hero entrance and an animated signup confirmation" width="100%">
+  <img src="assets/wow-moments-demo.gif" alt="Side by side: a signup form built with Rezi UI, before and after wow-moments. Before, the form is swapped for plain text on submit; after, the form enters with a soft blur and the confirmation settles in place as a check mark draws" width="100%">
 </p>
 
 Built for Claude Code, Codex and any agent that reads the open [Agent Skills](https://agentskills.io/specification) format. Each skill is opinionated, small enough to read in one sitting, and tested on a real app before it ships.
@@ -64,7 +64,7 @@ You:    go
 Agent:  builds both, typechecks, builds, runs verify.mjs → A1 PASS · A2 PASS
 ```
 
-Abridged from a real run on the [`landing-page`](examples/wow-moments/landing-page) fixture; the GIF above shows the result.
+The menu is abridged from a real run on the [`landing-page`](examples/wow-moments/landing-page) fixture; the verdict and PASS lines show the v0.4 flow. The GIF above shows the same two moments built on a [Rezi UI](https://reziui.rezianislami.workers.dev) signup form, recorded from the live demo on [portfolio.rezianislami.workers.dev/skills](https://portfolio.rezianislami.workers.dev/skills/).
 
 12 worked patterns · React and Vue · remembers your motion language between runs · a guardrail checker · evaluated end to end with a real agent
 

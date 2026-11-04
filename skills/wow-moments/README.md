@@ -3,7 +3,7 @@
 **Your UI works. Now find the three moments worth animating, not the thirty.**
 
 <p align="center">
-  <img src="../../assets/wow-moments-demo.gif" alt="Side by side: a plain landing page, and the same page after wow-moments added a hero entrance and an animated signup confirmation" width="100%">
+  <img src="../../assets/wow-moments-demo.gif" alt="Side by side: a signup form built with Rezi UI, before and after wow-moments. Before, the form is swapped for plain text on submit; after, the form enters with a soft blur and the confirmation settles in place as a check mark draws" width="100%">
 </p>
 
 Most AI-built interfaces animate everything: every section fades up, every card lifts, every number scrambles. That's exactly what makes them look generated. This skill works the other way round. It reads your product's flows, finds the moments that *mean* something, ranks them, caps them per screen, and asks you before touching a line of code.
@@ -56,7 +56,7 @@ Abridged, from a run on the [`landing-page`](../../examples/wow-moments/landing-
 | A2 ★ | Hero entrance: headline, subline, form fade in from a slight blur on first paint | transition | 9 | S |
 | A3 | Invalid email: the input shakes once and the error changes in place | micro | 8 | S |
 
-Picking `A1, A2` produced [`landing-page-after`](../../examples/wow-moments/landing-page-after), the right-hand side of the GIF above.
+Picking `A1, A2` produced [`landing-page-after`](../../examples/wow-moments/landing-page-after). The GIF above shows the same two moments on a [Rezi UI](https://reziui.rezianislami.workers.dev) signup form.
 
 ## Patterns included
 

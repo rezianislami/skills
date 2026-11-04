@@ -11,8 +11,9 @@
 // continues to the build, and the harness builds the app itself and inspects
 // the diff.
 //
-// Costs real tokens (roughly $0.5–2 per run), so it's run by hand before a
-// release, not on every push. Needs the `claude` CLI, logged in.
+// Costs real tokens (about $0.6 for a scan alone; a full --pick run on
+// sample-next-app measured $3.81 across scan, verdict and build), so it's run
+// by hand before a release, not on every push. Needs the `claude` CLI, logged in.
 
 import { execFileSync, spawnSync } from "node:child_process";
 import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -157,7 +158,9 @@ if (pick) {
 
   build = spawnSync("npm", ["run", "build"], { cwd: work, encoding: "utf8" });
   check("app still builds", build.status === 0, build.status === 0 ? "" : build.stdout.slice(-800));
-  check("report has a PASS/FAIL verdict", /\b(PASS|FAIL)\b/.test(impl.result.result ?? ""));
+  // One of the four labels in verdict-and-preview.md; a made-up label such as
+  // "Not fully verified" fails on purpose, so reports stay comparable.
+  check("report uses a final verdict label", /\b(PASS|FAIL|NOT VERIFIED)\b/.test(impl.result.result ?? ""));
   checks.cost =
     (scan.result.total_cost_usd ?? 0) + (verdict.result.total_cost_usd ?? 0) + (impl.result.total_cost_usd ?? 0);
   checks.verdict = verdictText;

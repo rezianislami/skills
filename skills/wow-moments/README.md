@@ -29,7 +29,8 @@ npx skills add rezianislami/skills --skill wow-moments
       │       `preview A1` writes a throwaway HTML preview. Stops until you say go.
       │
  5. Build     only what you confirmed, lightest technique first; then typecheck, build,
-              verify.mjs, failure-path tests, a PASS/FAIL verdict, and .wow-moments.md
+              verify.mjs, failure-path tests, a PASS / FAIL / NOT VERIFIED verdict,
+              and .wow-moments.md
 ```
 
 ## What makes it different

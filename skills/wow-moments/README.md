@@ -17,6 +17,8 @@
 
 Most AI-built interfaces animate everything: every section fades up, every card lifts, every number scrambles. That's exactly what makes them look generated. This skill works the other way round. It reads your product's flows, finds the moments that *mean* something, ranks them, caps them per screen, and asks you before touching a line of code.
 
+"Three" is a rule of thumb, not a hard limit. The skill scans every screen in your repo, and every candidate cites a real `file:line`. Per screen, it recommends at most one hero, three transition or micro moments and two interaction moments. An app with five screens can get far more than three, and a settings page can rightly get none.
+
 ```bash
 npx skills add rezianislami/skills --skill wow-moments
 ```
@@ -47,7 +49,7 @@ npx skills add rezianislami/skills --skill wow-moments
 | | |
 |---|---|
 | **Moment-first** | It looks for state changes users care about (first success, empty → filled, results arriving), not dropdowns to polish. |
-| **A budget, not a buffet** | At most one hero and three smaller moments per screen. "Nothing here" is a valid answer, and it tells you what it rejected and why. |
+| **A budget, not a buffet** | Per screen, at most one hero, three transition or micro moments and two interaction moments get recommended (★). Everything else it found is still listed under "Considered, not recommended" with the reason, so nothing is hidden. "Nothing here" is a valid answer. |
 | **Not only motion** | Some of the best moments are behaviour: a checkbox that saves instantly and rolls back on failure, undo instead of "Are you sure?", `/` to search, filters that survive a reload. |
 | **Quiet down** | Vibe-coded apps often animate everything. The menu can list up to five existing animations that compete with your best moment, and removes them only if you pick them. |
 | **You choose, then it tells you what it thinks** | The scan ends with a menu. Your picks get a verdict and a storyboard, and a live HTML preview on request, before a line of code changes. |

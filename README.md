@@ -115,7 +115,8 @@ skills/<name>/      the skill itself: SKILL.md, references/, README.md, CHANGELO
 examples/<name>/    test fixtures (not installed with the skill)
 evals/<name>/       end-to-end agent evals (run by hand, cost tokens)
 tools/              CI checks: skill format, links, typechecked code blocks, browser tests for skill scripts
-assets/             the demo GIF
+video/<name>/       Remotion sources for the demo videos (not installed)
+assets/             the demo GIFs
 .github/assets/     README banners
 ```
 

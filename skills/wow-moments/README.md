@@ -58,7 +58,13 @@ npx skills add rezianislami/skills --skill wow-moments
 
 ## A real menu
 
-Abridged, from a run on the [`landing-page`](../../examples/wow-moments/landing-page) fixture:
+<p align="center">
+  <img src="../../assets/wow-moments-menu.gif" alt="A terminal session: the prompt 'The page is done. Find wow moments in it.', then a menu of seven candidates for the landing page where only A1 (signup success, hero) and A2 (bottom CTA lands in the signup field, interaction) are starred, two ideas listed as considered but not recommended, the pick 'A1, A2', and a verdict: A1 GO, A2 GO with a note about how it interacts with A1" width="100%">
+</p>
+
+The scan and verdict from a v0.4 run on the [`landing-page`](../../examples/wow-moments/landing-page) fixture: seven candidates found, two recommended within the budget, and the rest listed with the reason they weren't picked. The text is the run's real output, shortened where a line didn't fit, and animated with Remotion from [`video/wow-moments-demo`](../../video/wow-moments-demo). The build step isn't shown.
+
+Menus differ from run to run. An earlier run on the same fixture, abridged:
 
 | ID | Moment | Tier | Score | Effort |
 |---|---|---|---|---|

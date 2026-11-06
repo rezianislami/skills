@@ -2,6 +2,15 @@
 
 **Your UI works. Now find the three moments worth animating, not the thirty.**
 
+<p>
+  <img alt="version 0.4.0" src="https://img.shields.io/badge/version-0.4.0-0063d7">
+  <img alt="React and Next.js" src="https://img.shields.io/badge/React-Next.js-149eca">
+  <img alt="Vue and Nuxt" src="https://img.shields.io/badge/Vue-Nuxt-42b883">
+  <img alt="15 patterns" src="https://img.shields.io/badge/patterns-15-171717">
+</p>
+
+[How it works](#how-it-works) · [Patterns](#patterns-included) · [What's inside](#whats-inside) · [Install](#install) · [Run memory](#run-memory) · [Verify](#verify-a-moment) · [Troubleshooting](#troubleshooting) · [Changelog](CHANGELOG.md)
+
 <p align="center">
   <img src="../../assets/wow-moments-demo.gif" alt="Side by side: a signup form built with Rezi UI, before and after wow-moments. Before, the form is swapped for plain text on submit; after, the form enters with a soft blur and the confirmation settles in place as a check mark draws" width="100%">
 </p>
@@ -81,6 +90,48 @@ Picking `A1, A2` produced [`landing-page-after`](../../examples/wow-moments/land
 
 Every pattern explains *why* it's built that way, and its code is typechecked in CI.
 
+## What's inside
+
+`SKILL.md` is what the agent reads first: the five phases and when to open each reference. The references load only when a phase needs them, so a scan doesn't pay for the build instructions.
+
+```
+skills/wow-moments/
+├── SKILL.md            the workflow the agent follows
+├── README.md           this page
+├── CHANGELOG.md
+├── references/         loaded on demand, one topic per file
+└── scripts/verify.mjs  guardrail checker, run in Phase 5
+```
+
+**Scan and menu**
+
+| File | What it decides |
+|---|---|
+| [moment-taxonomy.md](references/moment-taxonomy.md) | What to look for: each moment type, the code signals that reveal it, its usual tier and the trap to avoid |
+| [scoring.md](references/scoring.md) | The rubric that ranks candidates, so you can see why one idea beat another |
+| [budget.md](references/budget.md) | Per-screen caps and the one-signature-per-app rule |
+| [anti-slop.md](references/anti-slop.md) | Patterns that make an interface look generated, never proposed |
+| [candidate-format.md](references/candidate-format.md) | The menu layout: where, trigger, technique, cost |
+
+**Verdict and build**
+
+| File | What it decides |
+|---|---|
+| [verdict-and-preview.md](references/verdict-and-preview.md) | GO / GO with a note / SWAP, storyboards, the HTML preview and the final PASS / FAIL / NOT VERIFIED labels |
+| [motion-scale.md](references/motion-scale.md) | Default durations and easings, used only when the project has none of its own |
+| [implementation-react.md](references/implementation-react.md) | Which technique to reach for in React / Next.js, lightest first |
+| [implementation-vue.md](references/implementation-vue.md) | The Vue 3 / Nuxt shape of the same patterns |
+| [guardrails.md](references/guardrails.md) | The checks every built moment must pass |
+| [run-memory.md](references/run-memory.md) | The `.wow-moments.md` format and when it's read and written |
+
+**Patterns:** one `pattern-*.md` per row in [Patterns included](#patterns-included), each with the moment, why it's built that way, typechecked code and its reduced-motion path.
+
+## Requirements
+
+- A frontend that already works: React / Next.js (App Router or Pages Router) or Vue / Nuxt.
+- An agent that loads [Agent Skills](https://agentskills.io/specification): developed and evaluated with Claude Code; Codex reads the same format.
+- Optional, for `verify.mjs`: Playwright in your project or installed globally, plus Playwright's Chromium or an installed Google Chrome. Without them the build still runs and the verdict says NOT VERIFIED instead of PASS.
+
 ## Install
 
 ```bash
@@ -98,6 +149,32 @@ Works with **React / Next.js** (App Router and Pages Router) and **Vue / Nuxt**.
 
 > The UI is done. Find wow moments in it.
 
+Other phrasings that trigger it: "add delight", "where should we animate", "add micro-interactions", "make this app feel better".
+
+## Run memory
+
+After a build, the skill writes `.wow-moments.md` to your project root. Commit it, so everyone (and every agent) working on the app shares the same motion language:
+
+```markdown
+# Wow moments
+
+## Motion language
+- Easing: standard-out cubic-bezier(0.2, 0, 0, 1); long-out cubic-bezier(0.16, 1, 0.3, 1)
+- Durations: micro 150ms · transition 250ms · hero 600ms
+- Signature: soft blur-in (8px rise, 4px blur), used for the landing hero only
+
+## Built
+- 2026-11-02 · Signup success: check draws, confirmation takes the form's place (`components/signup.tsx`)
+
+## Quieted
+- 2026-11-04 · Hover lift on project cards removed, colour change kept (`components/project-card.tsx`)
+
+## Declined
+- 2026-11-02 · Monthly/yearly price roll: "price is read once, not worth it"
+```
+
+The next run reads it first: its motion language overrides the skill's defaults, and nothing under *Declined* is pitched again unless the code it depended on has changed. Edit it by hand if you like; delete it to start fresh. It never holds secrets or user data. Full format in [run-memory.md](references/run-memory.md).
+
 ## Verify a moment
 
 The skill runs this itself in Phase 5, but you can run it too, against any running page:
@@ -114,7 +191,28 @@ node skills/wow-moments/scripts/verify.mjs http://localhost:3000/ \
 ✓ no transform/filter traps fixed elements
 ```
 
-It needs Playwright in your project (or globally), and falls back to an installed Chrome if Playwright's browser isn't downloaded.
+It needs Playwright in your project (or globally), and falls back to an installed Chrome if Playwright's browser isn't downloaded. It never installs anything itself.
+
+| Flag | Does |
+|---|---|
+| `--fill "<selector>=<text>"` | Types into a field first. Splits on the last `=`, so `input[type=email]=…` works |
+| `--click "<selector>"` | Clicks to trigger the moment, after `--fill` |
+
+Exit codes: `0` all checks passed · `1` a check failed · `2` bad usage · `3` no Playwright or no browser.
+
+## Troubleshooting
+
+**The skill doesn't start.** Ask in the words it listens for ("find wow moments in this app"), or check the folder is where your agent looks (see [Install](#install)). Agents load a skill by its `description`, so a vague request like "improve the UI" may go elsewhere.
+
+**The menu says there's nothing worth animating.** That's a valid answer, not a failure: the budget prefers no moment to a weak one. The menu still lists what it rejected and why.
+
+**The verdict is NOT VERIFIED.** The build passed but `verify.mjs` couldn't run, usually because Playwright or a browser is missing. Install them (`npm i -D playwright && npx playwright install chromium`) and run the check above, or check the listed points by hand in DevTools. It isn't a pass.
+
+**`verify.mjs` exits with 3.** Same cause: no Playwright in the project or globally, or no Chromium and no Google Chrome.
+
+**It pitches something you already declined.** It only re-proposes a declined idea when the code it depended on has changed. If that's not the case, check the line is under *Declined* in `.wow-moments.md`.
+
+**It picked the wrong easing or durations.** Your project's own motion code wins, then `.wow-moments.md`, then the skill's defaults. Edit the *Motion language* section to set them.
 
 ## How it's tested
 
@@ -132,6 +230,10 @@ Motion-free fixtures live in [`examples/wow-moments`](../../examples/wow-moments
 cd examples/wow-moments/landing-page
 npm install && npm run dev
 ```
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md). The current version is in `metadata.version` in [SKILL.md](SKILL.md).
 
 ## License
 
